@@ -16,23 +16,28 @@
 
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Добавляем тег</h3>
-                </div>
-                <div class="box-body">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="exampleInputEmail1">Название</label>
-                            <input type="text" class="form-control" id="exampleInputEmail1" placeholder="">
+                <form method="POST" action="{{ route('tags.store')}}" accept-charset="UTF-8">
+                    @csrf
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Добавляем тег</h3>
+                        @include('admin.errors')
+                    </div>
+                    <div class="box-body">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Название</label>
+                                <input type="text" class="form-control" id="exampleInputEmail1" placeholder=""
+                                       name="title">
+                            </div>
                         </div>
                     </div>
-                </div>
-                <!-- /.box-body -->
-                <div class="box-footer">
-                    <button class="btn btn-default">Назад</button>
-                    <button class="btn btn-success pull-right">Добавить</button>
-                </div>
-                <!-- /.box-footer-->
+                    <!-- /.box-body -->
+                    <div class="box-footer">
+                        <a href="{{route('tags.index')}}" class="btn btn-default">Назад</a>
+                        <button class="btn btn-success pull-right" type="submit">Добавить</button>
+                    </div>
+                    <!-- /.box-footer-->
+                </form>
             </div>
             <!-- /.box -->
 

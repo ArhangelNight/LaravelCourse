@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Post extends Model
 {
@@ -36,6 +37,12 @@ class Post extends Model
             'post_id',
             'tag_id'
         );
+    }
+
+    public function sluggable()
+    {
+        $this->slug = Str::slug($this->title);
+        $this->save();
     }
 
     public static function add($fields)
