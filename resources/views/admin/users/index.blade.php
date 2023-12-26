@@ -1,6 +1,7 @@
 @extends('admin.layout')
 
 @section('content')
+
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
@@ -27,7 +28,7 @@
                 <!-- /.box-header -->
                 <div class="box-body">
                     <div class="form-group">
-                        <a href="create.html" class="btn btn-success">Добавить</a>
+                        <a href="{{route('users.create')}}" class="btn btn-success">Добавить</a>
                     </div>
                     <table id="example1" class="table table-bordered table-striped">
                         <thead>
@@ -40,25 +41,27 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Рахим</td>
-                            <td>rahim@marlindev.ru</td>
-                            <td>
-                                <img src="../assets/dist/img/photo1.png" alt="" class="img-responsive" width="150">
-                            </td>
-                            <td><a href="edit.html" class="fa fa-pencil"></a> <a href="#" class="fa fa-remove"></a></td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Джеймс</td>
-                            <td>james@example.com</td>
-                            <td>
-                                <img src="../assets/dist/img/photo2.png" alt="" class="img-responsive" width="150">
-                            </td>
-                            <td><a href="edit.html" class="fa fa-pencil"></a> <a href="#" class="fa fa-remove"></a></td>
-                        </tr>
-                        </tfoot>
+                        @foreach($users as $user)
+                            <tr>
+                                <td>{{$user->id}}</td>
+                                <td>{{$user->name}}</td>
+                                <td>{{$user->email}}</td>
+                                <td>
+                                    <img src="{{$user->getImage()}}" alt="" class="img-responsive" width="150">
+                                </td>
+
+                                <td><a href="{{route('users.edit', $user->id)}}" class="fa fa-pencil"></a>
+                                    <form method="post" action="{{ route('users.destroy',$user->id)}}" accept-charset="UTF-8">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button onclick="return confirm('are you sure?')" type="submit" class="delete-task">
+                                            <i class="fa fa-remove"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
                     </table>
                 </div>
                 <!-- /.box-body -->
@@ -69,4 +72,5 @@
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
+
 @endsection

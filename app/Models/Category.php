@@ -19,7 +19,7 @@ class Category extends Model
 
     public function sluggable()
     {
-        $this->slug = Str::slug($this->title);
+        $this->slug = Str::slug($this->title . '_' . $this->id);
         $this->save();
     }
 

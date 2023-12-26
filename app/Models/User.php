@@ -6,6 +6,8 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -15,32 +17,20 @@ class User extends Authenticatable
     const IS_BANNED = 1;
     const IS_ACTIVE = 0;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+
     protected $fillable = [
         'name',
         'email',
-        'password',
+        'password'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
+
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
+
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
@@ -59,7 +49,6 @@ class User extends Authenticatable
     {
         $user = new static();
         $user->fill($fields);
-        $user->password = bcrypt($fields['password']);
         $user->save();
 
         return $user;
@@ -68,33 +57,48 @@ class User extends Authenticatable
     public function edit($fields)
     {
         $this->fill($fields);
-        $this->password = bcrypt($fields['password']);
+
         $this->save();
+    }
+
+    public function generatePassword($password)
+    {
+        if ($password != null){
+            $this->password = bcrypt($password);
+            $this->save();
+        }
     }
 
     public function remove()
     {
-        Storage::delete('uploads/' . $this->image);
+        $this->removeAvatar();
         $this->delete();
     }
 
     public function uploadAvatar($image)
     {
         if ($image == null) {return;}
-        Storage::delete('uploads/' . $this->image);
-        $filename = str_random(10) . '.' . $image->extension();
-        $image->saveAs('uploads', $filename);
-        $this->image = $filename;
+        $this->removeAvatar();
+
+        $filepath = Storage::put('public/avatar', $image);
+        $filename = Str::after($filepath, 'public/');
+        $this->avatar = $filename;
         $this->save();
+    }
+
+    public function removeAvatar()
+    {
+        if($this->avatar !=null){
+            Storage::delete('public/' . $this->avatar);
+        }
     }
 
     public function getImage()
     {
-        if ($this->image == null)
-        {
-            return'/img/no-user-image.png';
+        if ($this->avatar == null){
+            return '/img/no-user-image.png';
         }
-        return '/uplofds/' . $this->image;
+        return asset('storage/'.$this->avatar);
     }
 
     public function makeAdmin()
@@ -111,8 +115,7 @@ class User extends Authenticatable
 
     public function toggleAdmin($value)
     {
-        if ($value == null)
-        {
+        if ($value == null){
             return $this->makeNormal();
         }
         return $this->makeAdmin();
@@ -127,15 +130,15 @@ class User extends Authenticatable
     public function unban()
     {
         $this->status = User::IS_ACTIVE;
-        $this->save();
     }
 
     public function toggleBan($value)
     {
-        if ($value == null)
-        {
+        if ($value == null){
             return $this->unban();
         }
         return $this->ban();
     }
+
+
 }
